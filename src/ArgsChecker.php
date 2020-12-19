@@ -4,7 +4,7 @@
 namespace phylogram\CronScheduleCleaning;
 
 
-class ArgsChecker
+    class ArgsChecker
 {
 
     public const INCOMPLETE = 0;
@@ -22,7 +22,7 @@ class ArgsChecker
     public function check(): bool
     {
         \array_walk_recursive($this->args, fn($value, $index) => $this->checkObjectValid($index) && $this->checkObjectValid($value) );
-        return \count($this->errors) === 0;
+        return \count($this->errors) !== 0;
     }
 
     private function checkObjectValid($value): bool
