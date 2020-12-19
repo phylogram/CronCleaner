@@ -147,6 +147,7 @@ class CronSchedule
 
     /**
      * \wp_unschedule_event can fail, because of wrong md5 hashes … force it
+     * @noinspection TypeUnsafeComparisonInspection This is necessary, because === fails for (nested) objects
      */
     public function forceDelete(): bool
     {
@@ -161,7 +162,7 @@ class CronSchedule
         $hashes = \array_keys(
             \array_filter(
                 $hook_crons,
-                fn (array $cron) => $cron['args'] == $this->args
+                fn (array $cron) => $cron['args'] == $this->cronDefinition['args']
             )
         );
 
