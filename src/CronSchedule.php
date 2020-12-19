@@ -22,6 +22,8 @@ class CronSchedule
     private bool $strict;
     private bool $force_on_corrupted_md5;
 
+    private ?ArgsChecker $argsChecker = null;
+
     /**
      * CronSchedule constructor.
      * @param int $timestamp
@@ -180,5 +182,19 @@ class CronSchedule
         }
         return _set_cron_array( $crons );
 
+    }
+
+    /**
+     * @return ArgsChecker|null
+     */
+    public function getArgsChecker(): ?ArgsChecker
+    {
+
+        if ($this->argsChecker === null) {
+            $args = $this->cronDefinition['args'] ?? null;
+            $this->argsChecker = new ArgsChecker($args);
+        }
+
+        return $this->argsChecker;
     }
 }
