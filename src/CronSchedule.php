@@ -154,17 +154,23 @@ class CronSchedule
         $crons = _get_cron_array();
         $hook_crons = $crons[$this->timestamp][$this->hook];
         $n = \count($hook_crons);
-        if ( $n !== 1) {
-            $hashes = \json_encode(\array_keys($hook_crons));
-            throw new \RuntimeException("Could not decide which one to one to delete. Found; {$hashes}");
-        }
         if ($n === 0) {
             throw new \LogicException('Did not find any hashes. Check the code');
         }
 
-        $hash = \array_keys($hook_crons)[0];
+        $hashes = \array_keys(
+            \array_filter(
+                $hook_crons,
+                fn (array $cron) => $cron['args'] == $this->args
+            )
+        );
 
-        unset($crons[$this->timestamp][$this->hook][$hash]);
+
+        foreach ($hashes as $hash)  {
+            unset($crons[$this->timestamp][$this->hook][$hash]);
+
+        }
+
         if ( empty( $crons[ $this->timestamp ][ $this->hook ] ) ) {
             unset( $crons[ $this->timestamp ][ $this->hook ] );
         }
