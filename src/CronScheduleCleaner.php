@@ -16,8 +16,9 @@ class CronScheduleCleaner
      * CronScheduleCleaner constructor.
      * @param string $pattern look for in actions
      * @param bool $strict
+     * @param bool $force_on_corrupted_md5
      */
-    public function __construct(string $pattern, bool $strict)
+    public function __construct(string $pattern, bool $strict, $force_on_corrupted_md5=false)
     {
         $crons = _get_cron_array();
         $filtered = [];
@@ -25,7 +26,7 @@ class CronScheduleCleaner
             foreach ($hooks as $hook => $crons) {
                 if (\preg_match($pattern, $hook)) {
                     foreach ($crons as $idx => $cron_definition) {
-                        $filtered[$hook][] = new CronSchedule((int) $timestamp, $hook, $cron_definition, $strict);
+                        $filtered[$hook][] = new CronSchedule((int) $timestamp, $hook, $cron_definition, $strict, $force_on_corrupted_md5);
                     }
                 }
             }
