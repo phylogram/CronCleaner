@@ -35,4 +35,14 @@ class RemoveCorruptedCrons
         return $this->faulty;
     }
 
+    public function __toString()
+    {
+        return \implode("\n", $this->faulty);
+    }
+
+    public function drop()
+    {
+        return \array_map(static fn (CronSchedule $cronSchedule) => $cronSchedule->remove(), $this->faulty);
+    }
+
 }
