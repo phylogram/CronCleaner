@@ -1,0 +1,22 @@
+{
+    "name": "phylogram/cron-cleaner",
+    "description": "Sometimes your Cronjobs in Wordpress get mixed up. Clean up!",
+    "type": "wordpress-library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "phylogram",
+            "email": "philip.roeggla@phylogram.eu"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {},
+    "require-dev": {
+        "roave/security-advisories": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "phylogram\\CronScheduleCleaning\\": "src"
+        }
+    }
+}
