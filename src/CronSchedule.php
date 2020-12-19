@@ -127,17 +127,9 @@ class CronSchedule
 
         if (! \array_key_exists($md5, $crons)) {
 
-            $crons = \array_map(static fn(array $cron): array => $cron['args'], $crons);
+            $available_md5s = \json_encode(\array_keys($crons));
 
-            $existing = \implode("\n\t\t",
-                \array_map(static fn(array $cron): string => print_r($cron, true), $crons)
-            );
-            $missing = print_r($args, true);
-
-            $any = \json_encode(\count(\array_filter($crons, static fn($any): bool => $any === $args)));
-
-            /** @noinspection LongLine */
-            return "Did not find md5 {$md5} in cron array [{$this->timestamp}, {$this->hook}]. Found {$any} sames … Args looking for {$missing}\n Having {$existing}";
+            return "Did not find md5 {$md5} in cron array [{$this->timestamp}, {$this->hook}]. Found {$available_md5s} md5 hashes";
         }
 
         $crons = $crons[$md5];
