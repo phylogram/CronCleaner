@@ -20,20 +20,23 @@ class CronSchedule
      */
     private array $cronDefinition;
     private bool $strict;
+    private bool $force_on_corrupted_md5;
 
     /**
      * CronSchedule constructor.
      * @param int $timestamp
      * @param string $hook
      * @param array $cron_definition
-     * @param $strict
+     * @param $strict bool throw Error (or just send message an false)
+     * @param bool $force_on_corrupted_md5
      */
-    public function __construct( int $timestamp, string $hook, array $cron_definition, bool $strict)
+    public function __construct(int $timestamp, string $hook, array $cron_definition, bool $strict=false, $force_on_corrupted_md5=false)
     {
         $this->timestamp = $timestamp;
         $this->hook = $hook;
         $this->cronDefinition = $cron_definition;
         $this->strict = $strict;
+        $this->force_on_corrupted_md5 = $force_on_corrupted_md5;
     }
 
     public function remove(): bool
@@ -43,14 +46,11 @@ class CronSchedule
             $this->hook,
             $this->cronDefinition['args']
         );
-        $message = $result ? 'Removed ' : 'Failed to remove ';
         $reasons = $this->findTroubles();
-        $message =  "\n\t{$message} {$this} because: {$reasons}\n";
         if ($this->strict) {
-            throw new \RuntimeException($message);
+            throw new \RuntimeException($reasons);
         }
 
-        echo $message;
         return $result;
     }
 
@@ -129,6 +129,12 @@ class CronSchedule
 
             $available_md5s = \json_encode(\array_keys($crons));
 
+            if ($this->force_on_corrupted_md5 === true) {
+                $result = \json_encode($this->forceDelete());
+                return "Did not find md5 {$md5} in cron array [{$this->timestamp}, {$this->hook}]. Forced delete with result: {$result} Found {$available_md5s} md5 hashes";
+
+            }
+
             return "Did not find md5 {$md5} in cron array [{$this->timestamp}, {$this->hook}]. Found {$available_md5s} md5 hashes";
         }
 
@@ -136,6 +142,36 @@ class CronSchedule
         $crons = \print_r($crons, true);
 
         return "No clue what happend ts: {$this->timestamp}, hook {$this->hook}, md5 {$md5}, cron {$crons}";
+
+    }
+
+    /**
+     * \wp_unschedule_event can fail, because of wrong md5 hashes … force it
+     */
+    public function forceDelete(): bool
+    {
+
+        $crons = _get_cron_array();
+        $hook_crons = $crons[$this->timestamp][$this->hook];
+        $n = \count($hook_crons);
+        if ( $n !== 1) {
+            $hashes = \json_encode(\array_keys($hook_crons));
+            throw new \RuntimeException("Could not decide which one to one to delete. Found; {$hashes}");
+        }
+        if ($n === 0) {
+            throw new \LogicException('Did not find any hashes. Check the code');
+        }
+
+        $hash = \array_keys($hook_crons)[0];
+
+        unset($crons[$this->timestamp][$this->hook][$hash]);
+        if ( empty( $crons[ $this->timestamp ][ $this->hook ] ) ) {
+            unset( $crons[ $this->timestamp ][ $this->hook ] );
+        }
+        if ( empty( $crons[ $this->timestamp ] ) ) {
+            unset( $crons[ $this->timestamp ] );
+        }
+        return _set_cron_array( $crons );
 
     }
 }
