@@ -7,6 +7,9 @@ namespace phylogram\CronScheduleCleaning;
 class RemoveCorruptedCrons
 {
 
+    /**
+     * @var CronSchedule[]
+     */
     private array $faulty = [];
 
     public function __construct()
@@ -16,7 +19,7 @@ class RemoveCorruptedCrons
         foreach ( $crons as $timestamp => $timestamp_crons) {
             foreach ( $timestamp_crons as $hook => $hook_crons) {
                 foreach ($hook_crons as $md5 => $cron_definition) {
-                    $cron = new CronSchedule($timestamp, $hook, $cron_definition);
+                    $cron = new CronSchedule($timestamp, $hook, $cron_definition, false, true);
                     $args_checker = $cron->getArgsChecker();
                     if ($args_checker->check()) {
                         $this->faulty[] = $cron;
