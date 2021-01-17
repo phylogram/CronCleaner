@@ -10,7 +10,9 @@
         }
     ],
     "minimum-stability": "stable",
-    "require": {},
+    "require": {
+      "ext-json": "*"
+    },
     "require-dev": {
         "roave/security-advisories": "dev-master"
     },
