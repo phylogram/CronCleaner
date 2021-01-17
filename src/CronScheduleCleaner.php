@@ -20,17 +20,7 @@ class CronScheduleCleaner
      */
     public function __construct(string $pattern, bool $strict, $force_on_corrupted_md5=false)
     {
-        $crons = _get_cron_array();
-        $filtered = [];
-        foreach ($crons as $timestamp => $hooks) {
-            foreach ($hooks as $hook => $crons) {
-                if (\preg_match($pattern, $hook)) {
-                    foreach ($crons as $idx => $cron_definition) {
-                        $filtered[$hook][] = new CronSchedule((int) $timestamp, $hook, $cron_definition, $strict, $force_on_corrupted_md5);
-                    }
-                }
-            }
-        }
+        $filtered = (new CronScheduleFinder($pattern, $strict, $force_on_corrupted_md5))->getCronSchedules();
 
         $filtered = \array_filter(
             $filtered,
