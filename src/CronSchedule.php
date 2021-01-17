@@ -83,7 +83,7 @@ class CronSchedule
      * @noinspection MultipleReturnStatementsInspection Whatever, that's wp
      *
      */
-    private function findTroubles(): string
+    public function findTroubles(): string
     {
         $numeric = is_numeric($this->timestamp);
         if (! $numeric) {
@@ -196,5 +196,13 @@ class CronSchedule
         }
 
         return $this->argsChecker;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isForceOnCorruptedMd5(): bool
+    {
+        return $this->force_on_corrupted_md5;
     }
 }
