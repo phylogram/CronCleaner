@@ -28,9 +28,8 @@ class CronScheduleManager
      *
      * @param CronSchedule[] $crons
      * @param string $hook
-     * @param int $n number of crons min to target
      */
-    public function __construct(array $crons, string $hook, int $n=1)
+    public function __construct(array $crons, string $hook)
     {
         $this->crons = $crons;
 
@@ -43,7 +42,7 @@ class CronScheduleManager
 
         $this->filtered = [];
 
-        if (\count($this->crons) > $n) {
+        if (\count($this->crons) > 1) {
             $dropped = false;
             foreach ($crons as $cron) {
                 if ($dropped === false && $cron->getTimestamp() === $newest) {
